@@ -1,3 +1,4 @@
+import { app } from './app.js'
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
@@ -6,7 +7,6 @@ import { healthRouter } from './routes/health.js'
 import { privacyRouter } from './routes/privacy.js'
 import { privacyLogger } from './middleware/privacy-logger.js'
 
-const app = express()
 const PORT = process.env.PORT ?? 3000
 
 app.use(helmet())

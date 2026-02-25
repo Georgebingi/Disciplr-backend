@@ -1,4 +1,6 @@
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
+import { queryParser } from '../middleware/queryParser.js'
+import { applyFilters, applySort, paginateArray } from '../utils/pagination.js'
 
 export const vaultsRouter = Router()
 
@@ -15,11 +17,33 @@ const vaults: Array<{
   createdAt: string
 }> = []
 
-vaultsRouter.get('/', (_req, res) => {
-  res.json({ vaults })
-})
+vaultsRouter.get(
+  '/',
+  queryParser({
+    allowedSortFields: ['createdAt', 'amount', 'endTimestamp', 'status'],
+    allowedFilterFields: ['status', 'creator'],
+  }),
+  (req: Request, res: Response) => {
+    let result = [...vaults]
 
-vaultsRouter.post('/', (req, res) => {
+    // Apply filters
+    if (req.filters) {
+      result = applyFilters(result, req.filters)
+    }
+
+    // Apply sorting
+    if (req.sort) {
+      result = applySort(result, req.sort)
+    }
+
+    // Apply pagination
+    const paginatedResult = paginateArray(result, req.pagination!)
+
+    res.json(paginatedResult)
+  }
+)
+
+vaultsRouter.post('/', (req: Request, res: Response) => {
   const {
     creator,
     amount,
@@ -52,7 +76,7 @@ vaultsRouter.post('/', (req, res) => {
   res.status(201).json(vault)
 })
 
-vaultsRouter.get('/:id', (req, res) => {
+vaultsRouter.get('/:id', (req: Request, res: Response) => {
   const vault = vaults.find((v) => v.id === req.params.id)
   if (!vault) {
     res.status(404).json({ error: 'Vault not found' })

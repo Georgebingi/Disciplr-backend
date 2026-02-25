@@ -15,6 +15,39 @@ const vaults: Array<{
   createdAt: string
 }> = []
 
+type VaultHistory = {
+  id: string
+  vaultId: string
+  oldStatus: string | null
+  newStatus: string
+  reason: string
+  actorUserIdOrAddress: string
+  createdAt: string
+  metadata: Record<string, unknown>
+}
+
+const vaultHistory: Array<VaultHistory> = []
+
+function appendVaultHistory(
+  vaultId: string,
+  oldStatus: string | null,
+  newStatus: string,
+  reason: string,
+  actorUserIdOrAddress: string,
+  metadata: Record<string, unknown> = {}
+) {
+  vaultHistory.push({
+    id: `history-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    vaultId,
+    oldStatus,
+    newStatus,
+    reason,
+    actorUserIdOrAddress,
+    createdAt: new Date().toISOString(),
+    metadata,
+  })
+}
+
 vaultsRouter.get('/', (_req, res) => {
   res.json({ vaults })
 })
@@ -49,7 +82,24 @@ vaultsRouter.post('/', (req, res) => {
     createdAt: startTimestamp,
   }
   vaults.push(vault)
+
+  appendVaultHistory(
+    id,
+    null,
+    'active',
+    'Vault created',
+    creator,
+    { initialAmount: amount }
+  )
+
   res.status(201).json(vault)
+})
+
+vaultsRouter.get('/:id/history', (req, res) => {
+  const history = vaultHistory
+    .filter((entry) => entry.vaultId === req.params.id)
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+  res.json({ history })
 })
 
 vaultsRouter.get('/:id', (req, res) => {

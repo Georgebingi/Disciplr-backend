@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import { authRouter } from './routes/auth.js'
 import { vaultsRouter } from './routes/vaults.js'
 import { healthRouter } from './routes/health.js'
 
@@ -12,6 +13,7 @@ app.use(cors({ origin: true }))
 app.use(express.json())
 
 app.use('/api/health', healthRouter)
+app.use('/api/auth', authRouter)
 app.use('/api/vaults', vaultsRouter)
 
 app.listen(PORT, () => {

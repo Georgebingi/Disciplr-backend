@@ -1,9 +1,9 @@
-import { Router } from 'express'
+import { Router, Request, Response } from 'express'
 
 export const vaultsRouter = Router()
 
 // In-memory placeholder; replace with DB (e.g. PostgreSQL) later
-const vaults: Array<{
+export interface Vault {
   id: string
   creator: string
   amount: string
@@ -13,7 +13,7 @@ const vaults: Array<{
   failureDestination: string
   status: 'active' | 'completed' | 'failed' | 'cancelled'
   createdAt: string
-}> = []
+}
 
 type VaultHistory = {
   id: string
@@ -48,11 +48,17 @@ function appendVaultHistory(
   })
 }
 
+export let vaults: Array<Vault> = []
+
+export const setVaults = (newVaults: Array<Vault>) => {
+  vaults = newVaults
+}
+
 vaultsRouter.get('/', (_req, res) => {
   res.json({ vaults })
 })
 
-vaultsRouter.post('/', (req, res) => {
+vaultsRouter.post('/', (req: Request, res: Response) => {
   const {
     creator,
     amount,
@@ -102,7 +108,7 @@ vaultsRouter.get('/:id/history', (req, res) => {
   res.json({ history })
 })
 
-vaultsRouter.get('/:id', (req, res) => {
+vaultsRouter.get('/:id', (req: Request, res: Response) => {
   const vault = vaults.find((v) => v.id === req.params.id)
   if (!vault) {
     res.status(404).json({ error: 'Vault not found' })

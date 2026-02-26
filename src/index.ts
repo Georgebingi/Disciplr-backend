@@ -4,9 +4,11 @@ const PORT = process.env.PORT ?? 3000
 import express from 'express'
 import cors from 'cors'
 import helmet from 'helmet'
+import { vaultsRouter, Vault } from './routes/vaults.js'
 import { authRouter } from './routes/auth.js'
 import { vaultsRouter } from './routes/vaults.js'
 import { healthRouter } from './routes/health.js'
+import { createExportRouter } from './routes/exports.js'
 import { transactionsRouter } from './routes/transactions.js'
 import { analyticsRouter } from './routes/analytics.js'
 import { privacyRouter } from './routes/privacy.js'
@@ -35,6 +37,7 @@ app.use('/health', healthRouter)
 app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)
 app.use('/api/vaults', vaultsRouter)
+app.use('/api/exports', createExportRouter(Vault))
 app.use('/api/transactions', transactionsRouter)
 app.use('/api/analytics', analyticsRouter)
 app.use('/api/privacy', privacyRouter)

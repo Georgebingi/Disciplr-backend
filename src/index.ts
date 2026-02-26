@@ -8,6 +8,7 @@ import { vaultsRouter, Vault } from './routes/vaults.js'
 import { authRouter } from './routes/auth.js'
 import { vaultsRouter } from './routes/vaults.js'
 import { healthRouter } from './routes/health.js'
+import { healthRateLimiter, vaultsRateLimiter } from './middleware/rateLimiter.js'
 import { createExportRouter } from './routes/exports.js'
 import { transactionsRouter } from './routes/transactions.js'
 import { analyticsRouter } from './routes/analytics.js'
@@ -33,6 +34,8 @@ app.use(securityMetricsMiddleware)
 app.use(securityRateLimitMiddleware)
 app.use(privacyLogger)
 
+app.use('/api/health', healthRateLimiter, healthRouter)
+app.use('/api/vaults', vaultsRateLimiter, vaultsRouter)
 app.use('/health', healthRouter)
 app.use('/api/health', healthRouter)
 app.use('/api/auth', authRouter)

@@ -8,12 +8,18 @@ import { transactionsRouter } from './routes/transactions.js'
 import { analyticsRouter } from './routes/analytics.js'
 import { privacyRouter } from './routes/privacy.js'
 import { privacyLogger } from './middleware/privacy-logger.js'
+import {
+  securityMetricsMiddleware,
+  securityRateLimitMiddleware,
+} from './security/abuse-monitor.js'
 
 const PORT = process.env.PORT ?? 3000
 
 app.use(helmet())
 app.use(cors({ origin: true }))
 app.use(express.json())
+app.use(securityMetricsMiddleware)
+app.use(securityRateLimitMiddleware)
 app.use(privacyLogger)
 
 app.use('/api/health', healthRouter)
